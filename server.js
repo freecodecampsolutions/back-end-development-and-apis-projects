@@ -24,7 +24,48 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+const tryDateParse = (dateParam) => {
+  try {
+    if (new Date(dateParam).getTime() > 0) return new Date(dateParam);
+    if (new Date(parseInt(dateParam)).getTime() > 0) return new Date(parseInt(dateParam));
+  } catch (e) {
+    DebugApi(e);
+  }
+  return null;
+}
 
+const padZeros = n => String(n).padStart(2, '0');
+
+const formatDate = (dateObj) => {
+  console.log(dateObj)
+  const dayMap = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const monthMap = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const day = dayMap[dateObj.getDay()];
+  const date = padZeros(dateObj.getDate());
+  const month = monthMap[dateObj.getMonth()];
+  const year = dateObj.getFullYear();
+  const hours = padZeros(dateObj.getHours());
+  const minutes = padZeros(dateObj.getMinutes());
+  const seconds = padZeros(dateObj.getSeconds());
+  return `${day}, ${date} ${month} ${year} ${hours}:${minutes}:${seconds} GMT`
+}
+
+const timeStampController = (req, res) => {
+  const dateParam = req.params.date;
+  const date = dateParam ? tryDateParse(dateParam) : new Date();
+  if (date == null) {
+    return res.status(500).send({error: 'Invalid Date'});
+  }
+  // formatDate(date);
+  res.json({
+    unix: date.getTime(),
+    utc: formatDate(date).toString(),
+  });
+}
+
+// your first API endpoint... 
+app.get("/api/:date", timeStampController);
+app.get("/api", timeStampController);
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
