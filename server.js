@@ -1,6 +1,3 @@
-const Debug = require('debug');
-const DebugApi = Debug("api:server");
-
 // server.js
 // where your node app starts
 
@@ -22,36 +19,14 @@ app.get("/", function (req, res) {
 });
 
 
-tryDateParse = (dateParam) => {
-  try {
-    if (new Date(dateParam).getTime() > 0) return new Date(dateParam);
-    if (new Date(parseInt(dateParam)).getTime() > 0) return new Date(parseInt(dateParam));
-  } catch (e) {
-    DebugApi(e);
-  }
-  return null;
-}
-
-const timeStampController = (req, res) => {
-  const dateParam = req.params?.date;
-  console.log(dateParam);
-  const date = dateParam ? tryDateParse(dateParam) : new Date();
-  if (date == null) {
-    res.status(500).send({error: 'Invalid Date'});
-  }
-  res.json({
-    unix: date.getTime(),
-    utc: date.toString()
-  });
-}
-
 // your first API endpoint... 
-app.get("/api/:date", timeStampController);
-app.get("/api", timeStampController);
+app.get("/api/hello", function (req, res) {
+  res.json({greeting: 'hello API'});
+});
 
 
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT || 3001, function () {
+var listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
